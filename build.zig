@@ -62,6 +62,11 @@ pub fn build(b: *std.Build) void {
     const device = standardDeviceOption(b);
     const optimize = b.standardOptimizeOption(.{});
 
+    const fio = b.dependency("fio", .{
+        .target = device.crossTarget(),
+        .optimize = optimize,
+    });
+
     const options = b.addOptions();
     options.addOption([]const u8, "device", device.name);
 
@@ -74,6 +79,7 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.addModule("options", options.createModule());
+    exe.addModule("fio", fio.module("fio"));
 
     if (device.linker) |linkerPath| {
         exe.linker_script = .{ .path = linkerPath };

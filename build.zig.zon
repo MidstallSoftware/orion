@@ -2,4 +2,10 @@
   .name = "orion",
   .version = "0.1.0",
   .paths = .{"."},
+  .dependencies = .{
+    .fio = .{
+      .url = "https://github.com/MidstallSoftware/fio/archive/ead8168173552c2ee42761345f735db56e946ccc.tar.gz",
+      .hash = "122085de25fd908416690412f64ac954dc9860d87538164befad9556dc7641c811e1",
+    },
+  },
 }
