@@ -24,15 +24,15 @@ export fn _start(_: usize) noreturn {
         .divisor = 100,
     }) catch unreachable;
 
-    arch.interrupt.init();
-    log.info("Interrupts initialized", .{});
-
+    arch.timer.init();
     arch.clock.enable();
+
     arch.sbi.setTimer(1);
     log.info("Clock initialized", .{});
 
     std.log.info("Hellord", .{});
     arch.interrupt.enable();
 
+    @breakpoint();
     while (true) {}
 }

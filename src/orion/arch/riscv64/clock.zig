@@ -1,18 +1,17 @@
 const std = @import("std");
-const misc = @import("misc.zig");
+const cpu = @import("cpu.zig");
 const sbi = @import("sbi.zig");
-const Register = @import("reg.zig").Register;
 
 pub var tick: u64 = 0;
 
 pub fn enable() void {
-    var sie = Register.sie.r();
+    var sie = cpu.Register.sie.r();
     sie |= (1 << 5);
-    Register.sie.w(sie);
+    cpu.Register.sie.w(sie);
 }
 
 pub fn handle() void {
     tick += 1;
     std.log.info("Tick {}", .{tick});
-    sbi.setTimer(misc.getTime() + @as(usize, 1e7 / 100));
+    sbi.setTimer(cpu.getTime() + @as(usize, 1e7 / 100));
 }

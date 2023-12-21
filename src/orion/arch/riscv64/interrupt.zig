@@ -3,42 +3,39 @@ const log = std.log.scoped(.interrupt);
 
 const Context = @import("context.zig");
 const clock = @import("clock.zig");
-const Register = @import("reg.zig").Register;
+const cpu = @import("cpu.zig");
 
-const IRQ_BREAKPOINT: u64 = 3;
-const IRQ_S_TIMER: u64 = (0b1 << 63) + 5;
-
-extern fn register_interrupt_handler() void;
-
-export fn interrupt_handler(ctx: *Context, scause: usize, _: usize) void {
-    disable();
-
-    switch (scause) {
-        IRQ_BREAKPOINT => {
-            log.debug("Break point", .{});
-            ctx.sepc += 2;
+fn interruptHandler(ctx: *Context, cause: usize) void {
+    switch (cause) {
+        3 => {
+            cpu.list[cpu.hartId()].processIpi();
         },
-        IRQ_S_TIMER => clock.handle(),
+        7 => {
+            cpu.Register.mie.clr(1 << 7);
+            cpu.Register.mip.set(1 << 5);
+        },
         else => {
-            log.err("Interrupt scause: {x}, [sepc] = 0x{x:0>16}", .{
-                scause,
-                ctx.sepc,
+            log.err("Interrupt cause: {x}, [mepc] = 0x{x:0>16}", .{
+                cause,
+                ctx.mepc,
             });
         },
     }
+}
 
-    enable();
+export fn trap_handler(ctx: *Context, mcause: usize, _: usize) void {
+    if (mcause & ~@as(usize, 0x8000000000000000) != 0) {
+        interruptHandler(ctx, mcause);
+        return;
+    }
+
+    std.debug.panic("Could not handle trap {}", .{mcause});
 }
 
 pub fn enable() void {
-    Register.sstatus.set(1 << 1);
+    cpu.Register.sstatus.set(1 << 1);
 }
 
 pub fn disable() void {
-    Register.sstatus.clr(1 << 1);
-}
-
-pub fn init() void {
-    disable();
-    register_interrupt_handler();
+    cpu.Register.sstatus.clr(1 << 1);
 }

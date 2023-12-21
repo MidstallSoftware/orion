@@ -16,18 +16,14 @@ spin:
 	li t0, 0xDEADBEEF
 	sw t0, 0(sp)
 
+  la t0, trap_entry
+  csrw mtvec, t0
+  csrwi mip, 0
+
 	add a0, a1, x0
 	call _start
 
 forever: tail forever
-cache_as_ram:
-	ret
-smp_pause:
-	ret
-trap_entry:
-	ret
-hls_init:
-	ret
 .global abort
 abort: j abort
 

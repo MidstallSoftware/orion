@@ -1,3 +1,3 @@
 reg: [32]usize,
-sstatus: usize,
-sepc: usize,
+mstatus: usize,
+mepc: usize,
