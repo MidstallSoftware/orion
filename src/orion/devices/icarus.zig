@@ -6,8 +6,6 @@ pub const cpu = std.Target.Cpu{
     .features = std.Target.riscv.cpu.sifive_u74.features,
 };
 
-pub const codeModel = std.builtin.CodeModel.medium;
-
 pub const excludeFeatures = blk: {
     var set = std.Target.Cpu.Feature.Set.empty;
     set.addFeature(@intFromEnum(std.Target.riscv.Feature.d));

@@ -35,6 +35,9 @@ abort: j abort
 _stack:
 .space 65536
 
+.globl _stack_top
+_stack_top:
+
 .globl _stack_ptr
 .section .rodata
 _stack_ptr: .word 0x80020000
