@@ -1,6 +1,5 @@
 const std = @import("std");
 
-pub const clock = @import("riscv64/clock.zig");
 pub const cpu = @import("riscv64/cpu.zig");
 pub const interrupt = @import("riscv64/interrupt.zig");
 pub const sbi = @import("riscv64/sbi.zig");

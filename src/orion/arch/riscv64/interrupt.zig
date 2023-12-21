@@ -2,7 +2,6 @@ const std = @import("std");
 const log = std.log.scoped(.interrupt);
 
 const Context = @import("context.zig");
-const clock = @import("clock.zig");
 const cpu = @import("cpu.zig");
 
 fn interruptHandler(ctx: *Context, cause: usize) void {
@@ -11,6 +10,7 @@ fn interruptHandler(ctx: *Context, cause: usize) void {
             cpu.list[cpu.hartId()].processIpi();
         },
         7 => {
+            log.info("{}", .{cause});
             cpu.Register.mie.clr(1 << 7);
             cpu.Register.mip.set(1 << 5);
         },

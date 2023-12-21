@@ -25,8 +25,6 @@ export fn _start(_: usize) noreturn {
     }) catch unreachable;
 
     arch.timer.init();
-    arch.clock.enable();
-
     arch.sbi.setTimer(1);
     log.info("Clock initialized", .{});
 
