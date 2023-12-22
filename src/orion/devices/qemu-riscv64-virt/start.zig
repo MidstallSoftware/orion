@@ -2,8 +2,8 @@ const std = @import("std");
 const arch = @import("root").arch;
 const fio = @import("fio");
 const dtb = @import("../../dtb.zig");
+const FwCfg = @import("../../drivers/fw-cfg.zig");
 const log = std.log.scoped(.start);
-const firmwareSize = @import("root").device.binaryPadding;
 
 pub var uart: fio.uart.Base = undefined;
 
@@ -41,11 +41,20 @@ export fn _start(fdtPtr: usize) noreturn {
         if (cpuCount > 1) "'s" else "",
     });
 
+    const firmwareSize: usize = 0x200000;
     const memFree = memInfo.size - firmwareSize;
     std.log.info("Memory: {} free, {} used, {} total", .{
         memFree,
         firmwareSize,
         memInfo.size,
     });
+
+    const fwcfg = FwCfg.init(std.mem.readInt(u64, (fdt.find("fw-cfg@", "reg") catch @panic("Coult not locate fw-cfg"))[0..8], .big)) catch |e| std.debug.panic("Failed to initialize fw-cfg: {s}", .{ @errorName(e) });
+
+    var iter = fwcfg.fileIterator() catch |e| std.debug.panic("Failed to access fw-cfg files: {s}", .{ @errorName(e) });
+
+    while (iter.next() catch |e| std.debug.panic("Failed to iterate files: {s}", .{ @errorName(e) })) |file| {
+        std.log.info("{}", .{ file });
+    }
     while (true) {}
 }

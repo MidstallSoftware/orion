@@ -29,6 +29,8 @@ pub const device = blk: {
     unreachable;
 };
 
+pub const drivers = @import("orion/drivers.zig");
+
 pub usingnamespace if (@hasDecl(device, "panic")) struct {
     pub const panic = device.panic;
 } else if (@hasDecl(arch, "panic")) struct {

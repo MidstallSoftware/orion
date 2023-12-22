@@ -1,7 +1,7 @@
 ENTRY(_boot);
 SECTIONS {
     . = 0x80000000;
-    firmware_start = .;
+    firmware_start = 0x80000000;
 
     .bootblock :
     {
@@ -47,5 +47,7 @@ SECTIONS {
         *(.eh_frame)
     }
 
-    firmware_size = ABSOLUTE(. - firmware_start);
+    . += 0x200000;
+    firmware_end = .;
+    firmware_size = ABSOLUTE(. - 0x80000000);
 }
