@@ -37,6 +37,12 @@ pub usingnamespace if (@hasDecl(device, "panic")) struct {
 
 pub const dtb = @import("orion/dtb.zig");
 
+pub fn panic(msg: []const u8, _: ?*std.builtin.StackTrace, retAddr: ?usize) noreturn {
+    const addr = retAddr orelse @returnAddress();
+    std.log.scoped(.panic).err("0x{x}: {s}", .{ addr, msg });
+    while (true) @breakpoint();
+}
+
 pub fn log(
     comptime message_level: std.log.Level,
     comptime scope: @Type(.EnumLiteral),

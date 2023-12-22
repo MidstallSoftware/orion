@@ -3,14 +3,9 @@ const arch = @import("root").arch;
 const fio = @import("fio");
 const dtb = @import("../../dtb.zig");
 const log = std.log.scoped(.start);
+const firmwareSize = @import("root").device.binaryPadding;
 
 pub var uart: fio.uart.Base = undefined;
-
-pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace) noreturn {
-    _ = error_return_trace;
-    uart.writer().print("PANIC: {s}\n", .{msg});
-    while (true) {}
-}
 
 export fn _start(fdtPtr: usize) noreturn {
     uart = fio.uart.init(.ns16550a, .{
@@ -27,10 +22,8 @@ export fn _start(fdtPtr: usize) noreturn {
 
     arch.timer.init();
     arch.sbi.setTimer(1);
-    log.info("Clock initialized", .{});
-
-    std.log.info("Hellord", .{});
     arch.interrupt.enable();
+    log.info("Clock initialized", .{});
 
     const fdt: *dtb.Header = @ptrFromInt(fdtPtr);
     if (!fdt.valid()) @panic("fdt is not valid");
@@ -41,8 +34,18 @@ export fn _start(fdtPtr: usize) noreturn {
         break :blk i;
     };
 
-    const mem = fdt.findMemory() orelse @panic("No memory entry was present");
+    const memInfo = fdt.findMemory() orelse @panic("No memory entry was present");
 
-    std.log.info("System has {} CPU's and {} RAM", .{ cpuCount, mem.size });
+    std.log.info("System has {} CPU{s}", .{
+        cpuCount,
+        if (cpuCount > 1) "'s" else "",
+    });
+
+    const memFree = memInfo.size - firmwareSize;
+    std.log.info("Memory: {} free, {} used, {} total", .{
+        memFree,
+        firmwareSize,
+        memInfo.size,
+    });
     while (true) {}
 }

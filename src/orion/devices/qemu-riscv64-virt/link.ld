@@ -1,6 +1,7 @@
 ENTRY(_boot);
 SECTIONS {
     . = 0x80000000;
+    firmware_start = .;
 
     .bootblock :
     {
@@ -45,4 +46,6 @@ SECTIONS {
     /DISCARD/ : {
         *(.eh_frame)
     }
+
+    firmware_size = ABSOLUTE(. - firmware_start);
 }

@@ -16,6 +16,7 @@ pub const Device = struct {
     codeModel: ?std.builtin.CodeModel = null,
     linker: ?[]const u8 = null,
     excludeFeatures: ?std.Target.Cpu.Feature.Set = null,
+    includeFeatures: ?std.Target.Cpu.Feature.Set = null,
     assemblyFiles: ?[]const []const u8 = null,
     binaryPadding: ?u64 = null,
 
@@ -40,7 +41,10 @@ pub const Device = struct {
                 .tag = .freestanding,
                 .version_range = .{ .none = {} },
             },
-            .abi = .none,
+            .abi = std.Target.Abi.default(self.cpu.arch, .{
+                .tag = .freestanding,
+                .version_range = .{ .none = {} },
+            }),
             .ofmt = .elf,
         };
     }
@@ -49,6 +53,10 @@ pub const Device = struct {
         var xtarget = std.zig.CrossTarget.fromTarget(self.target());
         if (self.excludeFeatures) |excludeFeatures| {
             xtarget.cpu_features_sub = excludeFeatures;
+        }
+
+        if (self.includeFeatures) |includeFeatures| {
+            xtarget.cpu_features_add = includeFeatures;
         }
         return xtarget;
     }
@@ -70,6 +78,7 @@ pub fn standardDeviceOption(b: *std.Build) Device {
                     device.linker,
                 })) else null,
                 .excludeFeatures = if (@hasDecl(device, "excludeFeatures")) device.excludeFeatures else null,
+                .includeFeatures = if (@hasDecl(device, "includeFeatures")) device.includeFeatures else null,
                 .assemblyFiles = if (@hasDecl(device, "assemblyFiles")) device.assemblyFiles else null,
                 .binaryPadding = if (@hasDecl(device, "binaryPadding")) device.binaryPadding else null,
             };
