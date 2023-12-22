@@ -35,6 +35,8 @@ pub usingnamespace if (@hasDecl(device, "panic")) struct {
     pub const panic = arch.panic;
 } else struct {};
 
+pub const dtb = @import("orion/dtb.zig");
+
 pub fn log(
     comptime message_level: std.log.Level,
     comptime scope: @Type(.EnumLiteral),

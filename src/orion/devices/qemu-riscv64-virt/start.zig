@@ -1,6 +1,7 @@
 const std = @import("std");
 const arch = @import("root").arch;
 const fio = @import("fio");
+const dtb = @import("../../dtb.zig");
 const log = std.log.scoped(.start);
 
 pub var uart: fio.uart.Base = undefined;
@@ -11,7 +12,7 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace) nore
     while (true) {}
 }
 
-export fn _start(_: usize) noreturn {
+export fn _start(fdtPtr: usize) noreturn {
     uart = fio.uart.init(.ns16550a, .{
         .baseAddress = 0x1000_0000,
         .wordLength = .@"8",
@@ -31,6 +32,17 @@ export fn _start(_: usize) noreturn {
     std.log.info("Hellord", .{});
     arch.interrupt.enable();
 
-    @breakpoint();
+    const fdt: *dtb.Header = @ptrFromInt(fdtPtr);
+    if (!fdt.valid()) @panic("fdt is not valid");
+
+    const cpuCount = blk: {
+        var i: usize = 0;
+        while (fdt.findCpuId(i) != null) : (i += 1) {}
+        break :blk i;
+    };
+
+    const mem = fdt.findMemory() orelse @panic("No memory entry was present");
+
+    std.log.info("System has {} CPU's and {} RAM", .{ cpuCount, mem.size });
     while (true) {}
 }
