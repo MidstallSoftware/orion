@@ -33,7 +33,6 @@ export fn _start(fdtPtr: usize) noreturn {
 
     arch.timer.init();
     arch.sbi.setTimer(1);
-    arch.interrupt.enable();
     log.info("Clock initialized", .{});
 
     const fdt: *dtb.Header = @ptrFromInt(fdtPtr);
@@ -58,9 +57,9 @@ export fn _start(fdtPtr: usize) noreturn {
 
     const memFree = memInfo.size - firmwareSize;
     std.log.info("Memory: {} free, {} used, {} total", .{
-        memFree,
-        firmwareSize,
-        memInfo.size,
+        std.fmt.fmtIntSizeDec(memFree),
+        std.fmt.fmtIntSizeDec(firmwareSize),
+        std.fmt.fmtIntSizeDec(memInfo.size),
     });
 
     var fba = std.heap.FixedBufferAllocator.init(@as([*]u8, @ptrFromInt(firmwareEnd))[0..memFree]);

@@ -62,6 +62,10 @@ comptime {
     _ = arch;
     _ = device;
 
+    if (@hasDecl(arch, "interrupt")) {
+        _ = arch.interrupt;
+    }
+
     if (@hasDecl(device, "start")) {
         _ = device.start;
     }
