@@ -14,6 +14,16 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const phantom = b.dependency("phantom", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const vizops = b.dependency("vizops", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
     const options = b.addOptions();
     options.addOption([]const u8, "device", device.name);
 
@@ -27,6 +37,8 @@ pub fn build(b: *std.Build) void {
 
     exe.addModule("options", options.createModule());
     exe.addModule("fio", fio.module("fio"));
+    exe.addModule("phantom", phantom.module("phantom"));
+    exe.addModule("vizops", vizops.module("vizops"));
 
     if (device.linker) |linkerPath| {
         exe.linker_script = .{ .path = linkerPath };

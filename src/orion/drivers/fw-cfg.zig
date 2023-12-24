@@ -8,7 +8,7 @@ const File = extern struct {
     name: [56]u8,
 
     pub fn write(self: *const File, fwcfg: *const Self, buff: []const u8) !void {
-        return fwcfg.dma(@as([*]u8, @ptrFromInt(buff.ptr))[0..buff.len], (1 << 4) | (1 << 3) | (@as(u32, self.select) << 16));
+        return fwcfg.dma(@constCast(buff), (1 << 4) | (1 << 3) | (@as(u32, self.select) << 16));
     }
 
     pub fn read(self: *const File, fwcfg: *const Self, buff: []u8) !void {
@@ -130,7 +130,7 @@ pub fn getVariable(self: *const Self, comptime T: type, selector: ?u16) !T {
 }
 
 pub fn findFile(self: *const Self, filename: []const u8) !?File {
-    var iter = self.fileIterator();
+    var iter = try self.fileIterator();
 
     while (try iter.next()) |file| {
         if (std.mem.eql(u8, filename, file.name[0..filename.len]) and file.name[filename.len] == 0) return file;
@@ -139,10 +139,13 @@ pub fn findFile(self: *const Self, filename: []const u8) !?File {
 }
 
 pub fn accessFile(self: *const Self, filename: []const u8) !?FileAccess {
-    return .{
-        .fwcfg = self,
-        .file = try self.findFile(filename),
-    };
+    if (try self.findFile(filename)) |file| {
+        return .{
+            .fwcfg = self,
+            .file = file,
+        };
+    }
+    return null;
 }
 
 pub fn fileIterator(self: *const Self) !FileIterator {
