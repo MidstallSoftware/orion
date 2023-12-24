@@ -99,15 +99,13 @@ pub fn init(baseAddress: usize) !Self {
 pub fn dma(self: *const Self, buf: []u8, ctrl: u32) !void {
     const dmaAddress: *volatile u64 = @ptrFromInt(self.baseAddress + 16);
 
-    var accessBytes: [@sizeOf(DmaAccess)]u8 = undefined;
-    const access: *volatile DmaAccess = @ptrCast(@alignCast(&accessBytes[0]));
-    access.* = .{
+    var access = DmaAccess{
         .ctrl = std.mem.nativeTo(u32, ctrl, .big),
         .len = std.mem.nativeTo(u32, @intCast(buf.len), .big),
         .addr = std.mem.nativeTo(u64, @intFromPtr(buf.ptr), .big),
     };
 
-    dmaAddress.* = std.mem.nativeTo(u64, @intFromPtr(access), .big);
+    dmaAddress.* = std.mem.nativeTo(u64, @intFromPtr(&access), .big);
     asm volatile ("" ::: "memory");
 
     while (true) {

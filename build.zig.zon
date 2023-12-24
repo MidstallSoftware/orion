@@ -8,8 +8,8 @@
       .hash = "12206859a87f722279a1be7ffc4617241631ac2850b6f3fe0768b25ada1f7372b6c4",
     },
     .@"phantom.compat.zigimg" = .{
-      .url = "https://github.com/PhantomUIx/compat-zigimg/archive/e8fcb8681bdfcd0b4f1151f207fe4a6c89c1d1b6.tar.gz",
-      .hash = "1220be41c35eb8b3c0428b02ae9c4639d80310da1b00f9d5f8aad2a90ca5b0c754d7",
+      .url = "https://github.com/PhantomUIx/compat-zigimg/archive/266efc67adf83d20c0b1d2eab52c98bccba65f0e.tar.gz",
+      .hash = "122040188f263e649409cdeba5d243c106d8fdcf349706a0733530681d867deb7ebb",
     },
     .phantom = .{
       .url = "https://github.com/PhantomUIx/core/archive/0cbea8f53e650f4864bf41c372c330a050710c10.tar.gz",

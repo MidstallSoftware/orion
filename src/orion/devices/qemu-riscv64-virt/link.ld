@@ -47,7 +47,5 @@ SECTIONS {
         *(.eh_frame)
     }
 
-    . += 0x200000;
     firmware_end = .;
-    firmware_size = ABSOLUTE(. - 0x80000000);
 }

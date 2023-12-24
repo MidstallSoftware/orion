@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 const options = @import("options");
 
 pub const std_options = struct {
-    pub const log_level = .info;
+    pub const log_level = if (builtin.mode == .Debug) .debug else .info;
     pub const logFn = log;
 };
 
