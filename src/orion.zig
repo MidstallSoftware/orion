@@ -29,15 +29,16 @@ pub const device = blk: {
     unreachable;
 };
 
-pub const drivers = @import("orion/drivers.zig");
-
 pub usingnamespace if (@hasDecl(device, "panic")) struct {
     pub const panic = device.panic;
 } else if (@hasDecl(arch, "panic")) struct {
     pub const panic = arch.panic;
 } else struct {};
 
+pub const drivers = @import("orion/drivers.zig");
 pub const dtb = @import("orion/dtb.zig");
+pub const main = @import("orion/main.zig");
+pub const uefi = @import("orion/uefi.zig");
 
 pub fn panic(msg: []const u8, _: ?*std.builtin.StackTrace, retAddr: ?usize) noreturn {
     const addr = retAddr orelse @returnAddress();

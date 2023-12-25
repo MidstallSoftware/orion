@@ -1,6 +1,7 @@
 const std = @import("std");
 const dtb = @import("dtb.zig");
 const FwCfg = @import("drivers/fw-cfg.zig");
+const uefi = @import("uefi.zig");
 const phantom = @import("phantom");
 const vizops = @import("vizops");
 
@@ -20,6 +21,8 @@ pub const Options = struct {
 };
 
 pub fn main(options: Options) !void {
+    try uefi.init(options.allocator);
+
     if (options.fwcfg) |fwcfg| {
         if (fwcfg.accessFile("etc/ramfb") catch null) |ramfb| {
             std.log.debug("Found ramfb: {}", .{ramfb});
