@@ -12,12 +12,5 @@ pub fn createTable(in: anytype) @TypeOf(in) {
         .crc32 = 0,
         .reserved = 0,
     };
-    return hashTable(value);
-}
-
-pub fn hashTable(in: anytype) @TypeOf(in) {
-    const crc32 = std.hash.Crc32.hash(std.mem.asBytes(&in));
-    var value = in;
-    value.hdr.crc32 = crc32;
     return value;
 }

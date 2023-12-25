@@ -4,9 +4,9 @@ const runtimeServices = @import("runtime-services.zig");
 
 pub const configTable = [_]std.os.uefi.tables.ConfigurationTable{};
 
-pub const tbl = utils.createTable(std.os.uefi.tables.SystemTable{
+pub var tbl = utils.createTable(std.os.uefi.tables.SystemTable{
     .hdr = undefined,
-    .firmware_vendor = "Midstall Software",
+    .firmware_vendor = @constCast(std.unicode.utf8ToUtf16LeStringLiteral("Midstall Software").ptr),
     .firmware_revision = 0,
     .console_in_handle = null,
     .con_in = null,
@@ -17,5 +17,5 @@ pub const tbl = utils.createTable(std.os.uefi.tables.SystemTable{
     .runtime_services = &runtimeServices.tbl,
     .boot_services = null,
     .number_of_table_entries = configTable.len,
-    .configuration_table = (&configTable).ptr,
+    .configuration_table = @constCast((&configTable).ptr),
 });

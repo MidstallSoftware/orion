@@ -1,7 +1,7 @@
 const std = @import("std");
 const utils = @import("utils.zig");
 
-pub const tbl = utils.createTable(std.os.uefi.tables.RuntimeServices{
+pub var tbl = utils.createTable(std.os.uefi.tables.RuntimeServices{
     .hdr = undefined,
     .getTime = getTime,
     .setTime = setTime,
