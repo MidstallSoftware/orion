@@ -40,9 +40,18 @@ pub const dtb = @import("orion/dtb.zig");
 pub const main = @import("orion/main.zig");
 pub const uefi = @import("orion/uefi.zig");
 
-pub fn panic(msg: []const u8, _: ?*std.builtin.StackTrace, retAddr: ?usize) noreturn {
-    const addr = retAddr orelse @returnAddress();
-    std.log.scoped(.panic).err("0x{x}: {s}", .{ addr, msg });
+pub fn panic(msg: []const u8, stackTraceOpt: ?*std.builtin.StackTrace, retAddr: ?usize) noreturn {
+    const logger = std.log.scoped(.panic);
+
+    logger.err("0x{x}: {s}", .{ retAddr orelse @returnAddress(), msg });
+
+    if (stackTraceOpt) |stackTrace| {
+        logger.err("Stack trace:", .{});
+        for (stackTrace.instruction_addresses) |addr| {
+            logger.err("\t0x{x}", .{addr});
+            if (addr == 0) break;
+        }
+    }
     while (true) @breakpoint();
 }
 

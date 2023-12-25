@@ -27,8 +27,6 @@ pub fn main(options: Options) !void {
         if (fwcfg.accessFile("etc/ramfb") catch null) |ramfb| {
             std.log.debug("Found ramfb: {}", .{ramfb});
 
-            const fourcc = vizops.color.fourcc.formats.xrgb8888;
-
             if (ramfb.file.size != @sizeOf(Ramfb)) {
                 std.debug.panic("Ramfb size mismatch (file: {}, struct: {})", .{ ramfb.file.size, @sizeOf(Ramfb) });
             }
@@ -36,13 +34,13 @@ pub fn main(options: Options) !void {
             const fb = try phantom.painting.fb.AllocatedFrameBuffer.create(options.allocator, .{
                 .res = .{ .value = .{ 1024, 768 } },
                 .colorspace = .sRGB,
-                .colorFormat = try vizops.color.fourcc.Value.decode(fourcc),
+                .colorFormat = try vizops.color.fourcc.Value.decode(vizops.color.fourcc.formats.bgrx8888),
             });
             defer fb.deinit();
 
             var ramfbConfig = Ramfb{
                 .addr = std.mem.nativeTo(u64, @intFromPtr(try fb.addr()), .big),
-                .fourcc = std.mem.nativeTo(u32, fourcc, .big),
+                .fourcc = std.mem.nativeTo(u32, vizops.color.fourcc.formats.xrgb8888, .big),
                 .flags = std.mem.nativeTo(u32, 0, .big),
                 .width = std.mem.nativeTo(u32, @intCast(fb.info().res.value[0]), .big),
                 .height = std.mem.nativeTo(u32, @intCast(fb.info().res.value[1]), .big),
