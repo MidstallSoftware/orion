@@ -2,7 +2,6 @@ const std = @import("std");
 const arch = @import("root").arch;
 const fio = @import("fio");
 const dtb = @import("../../dtb.zig");
-const FwCfg = @import("../../drivers/fw-cfg.zig");
 const phantom = @import("phantom");
 const vizops = @import("vizops");
 const log = std.log.scoped(.start);
@@ -59,7 +58,7 @@ export fn _start(fdtPtr: usize) noreturn {
         @intFromPtr(fba.buffer.ptr),
     });
 
-    const fwcfg = FwCfg.init(std.mem.readInt(u64, (fdt.find("fw-cfg@", "reg") catch @panic("Coult not locate fw-cfg"))[0..8], .big)) catch |e| std.debug.panic("Failed to initialize fw-cfg: {s}", .{@errorName(e)});
+    const fwcfg = fio.FwCfg.init(std.mem.readInt(u64, (fdt.find("fw-cfg@", "reg") catch @panic("Coult not locate fw-cfg"))[0..8], .big)) catch |e| std.debug.panic("Failed to initialize fw-cfg: {s}", .{@errorName(e)});
 
     @import("../../main.zig").main(.{
         .allocator = fba.allocator(),
