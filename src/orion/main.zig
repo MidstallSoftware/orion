@@ -1,3 +1,4 @@
+const builtin = @import("builtin");
 const std = @import("std");
 const dtb = @import("dtb.zig");
 const uefi = @import("uefi.zig");
@@ -13,6 +14,32 @@ pub const Options = struct {
 
 pub fn main(options: Options) !void {
     try uefi.init(options.allocator);
+
+    if (@as(?[]const u8, comptime switch (builtin.cpu.arch) {
+        .aarch64 => "pcie@",
+        .riscv64 => "pci@",
+        else => null,
+    })) |pciNodePrefix| {
+        if (options.fdt.find(pciNodePrefix, "reg") catch null) |pciBlob| {
+            const barBlob = try options.fdt.find(pciNodePrefix, "ranges");
+
+            const pci = try fio.pci.bus.Mmio.create(.{
+                .allocator = options.allocator,
+                .baseAddress = std.mem.readInt(u64, pciBlob[0..][0..8], .big),
+                .size = std.mem.readInt(u64, pciBlob[8..][0..8], .big),
+                .base32 = std.mem.readInt(u64, barBlob[0x28..][0..8], .big),
+                .base64 = std.mem.readInt(u64, barBlob[0x3C..][0..8], .big),
+            });
+            defer pci.deinit();
+
+            const devices = try pci.enumerate();
+            defer devices.deinit();
+
+            for (devices.items) |dev| {
+                std.log.info("PCI device: {}", .{dev});
+            }
+        }
+    }
 
     if (options.fwcfg) |fwcfg| {
         if (fwcfg.accessFile("etc/ramfb") catch null) |_| {
