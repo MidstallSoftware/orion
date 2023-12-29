@@ -41,6 +41,15 @@ pub fn main(options: Options) !void {
         }
     }
 
+    if (options.fdt.find("rtc", "compatible") catch null) |rtcKind| {
+        if (std.mem.eql(u8, rtcKind[0..(rtcKind.len - 1)], "google,goldfish-rtc")) {
+            var rtc = fio.rtc.init(.goldfish, .{
+                .baseAddress = std.mem.readInt(u64, (try options.fdt.find("rtc", "reg"))[0..8], .big),
+            });
+            std.log.info("{}", .{rtc.readTime()});
+        }
+    }
+
     if (options.fwcfg) |fwcfg| {
         if (fwcfg.accessFile("etc/ramfb") catch null) |_| {
             const surface = try phantom.display.backends.ramfb.Surface.new(options.allocator, .{
