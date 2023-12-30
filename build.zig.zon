@@ -4,16 +4,20 @@
   .paths = .{"."},
   .dependencies = .{
     .fio = .{
-      .url = "https://github.com/MidstallSoftware/fio/archive/96ef5ebc942924edfc3b107765598f4b4c8b0071.tar.gz",
-      .hash = "122037d6e3c7a5c4c87b2887acba9e0b5d6d3e88cfa4e3857d544dc39a48af8ea15c",
+      .url = "https://github.com/MidstallSoftware/fio/archive/371e2c33f484e774f3bbe2de62c0b89157d3e00f.tar.gz",
+      .hash = "12205a82bc64da304c3358b0cf91f20fb32b232db51e2641fa0a586cd7d462ba40d6",
+    },
+    .dtree = .{
+      .url = "https://github.com/MidstallSoftware/dtree/archive/da5052d06dc3c638d87ab3745dcb6f0daf81d46f.tar.gz",
+      .hash = "12203d59164a9095faee174e42817334c7e6ff7dc055bfcab7018e558d9c5cadf593",
     },
     .@"phantom.compat.zigimg" = .{
       .url = "https://github.com/PhantomUIx/compat-zigimg/archive/266efc67adf83d20c0b1d2eab52c98bccba65f0e.tar.gz",
       .hash = "122040188f263e649409cdeba5d243c106d8fdcf349706a0733530681d867deb7ebb",
     },
     .@"phantom.display.ramfb" = .{
-      .url = "https://github.com/PhantomUIx/display-ramfb/archive/8d0114bc905f0c46b095aa4b3f3346e1a59bd853.tar.gz",
-      .hash = "122062e6242146691ae218b2988be8b355ecbd2c8b3e644f2de1559c6c4f25c288fa",
+      .url = "https://github.com/PhantomUIx/display-ramfb/archive/bacf956185cc3116fc20a7fe437d31c59de9038b.tar.gz",
+      .hash = "122026457409aa5d27b8ecb23ae8c623ca9b0ed8425981b92e7a6b82b31fc8adac92",
     },
     .phantom = .{
       .url = "https://github.com/PhantomUIx/core/archive/0cbea8f53e650f4864bf41c372c330a050710c10.tar.gz",

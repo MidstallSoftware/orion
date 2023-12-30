@@ -14,6 +14,11 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const dtree = b.dependency("dtree", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
     const phantom = b.dependency("phantom", .{
         .target = target,
         .optimize = optimize,
@@ -37,6 +42,7 @@ pub fn build(b: *std.Build) void {
 
     exe.addModule("options", options.createModule());
     exe.addModule("fio", fio.module("fio"));
+    exe.addModule("dtree", dtree.module("dtree"));
     exe.addModule("phantom", phantom.module("phantom"));
     exe.addModule("vizops", vizops.module("vizops"));
 

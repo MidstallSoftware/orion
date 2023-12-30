@@ -1,54 +1,30 @@
 const builtin = @import("builtin");
 const std = @import("std");
-const dtb = @import("dtb.zig");
 const uefi = @import("uefi.zig");
 const fio = @import("fio");
+const dtree = @import("dtree");
 const phantom = @import("phantom");
 const vizops = @import("vizops");
 
 pub const Options = struct {
     allocator: std.mem.Allocator,
-    fdt: *dtb.Header,
+    dtb: ?dtree.Reader,
     fwcfg: ?fio.FwCfg,
 };
 
 pub fn main(options: Options) !void {
     try uefi.init(options.allocator);
 
-    if (@as(?[]const u8, comptime switch (builtin.cpu.arch) {
-        .aarch64 => "pcie@",
-        .riscv64 => "pci@",
-        else => null,
-    })) |pciNodePrefix| {
-        if (options.fdt.find(pciNodePrefix, "reg") catch null) |pciBlob| {
-            const barBlob = try options.fdt.find(pciNodePrefix, "ranges");
+    const devMan = try fio.DeviceManager.create(.{
+        .allocator = options.allocator,
+        .dtb = options.dtb,
+    });
+    defer devMan.deinit();
 
-            const pci = try fio.pci.bus.Mmio.create(.{
-                .allocator = options.allocator,
-                .baseAddress = std.mem.readInt(u64, pciBlob[0..][0..8], .big),
-                .size = std.mem.readInt(u64, pciBlob[8..][0..8], .big),
-                .base32 = std.mem.readInt(u64, barBlob[0x28..][0..8], .big),
-                .base64 = std.mem.readInt(u64, barBlob[0x3C..][0..8], .big),
-            });
-            defer pci.deinit();
+    const list = try devMan.enumerateDeviceTree();
+    defer list.deinit();
 
-            const devices = try pci.enumerate();
-            defer devices.deinit();
-
-            for (devices.items) |dev| {
-                std.log.info("PCI device: {}", .{dev});
-            }
-        }
-    }
-
-    if (options.fdt.find("rtc", "compatible") catch null) |rtcKind| {
-        if (std.mem.eql(u8, rtcKind[0..(rtcKind.len - 1)], "google,goldfish-rtc")) {
-            var rtc = fio.rtc.init(.goldfish, .{
-                .baseAddress = std.mem.readInt(u64, (try options.fdt.find("rtc", "reg"))[0..8], .big),
-            });
-            std.log.info("{}", .{rtc.readTime()});
-        }
-    }
+    for (list.items) |e| std.log.info("Found {}", .{e});
 
     if (options.fwcfg) |fwcfg| {
         if (fwcfg.accessFile("etc/ramfb") catch null) |_| {

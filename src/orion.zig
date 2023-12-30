@@ -36,7 +36,6 @@ pub usingnamespace if (@hasDecl(device, "panic")) struct {
 } else struct {};
 
 pub const drivers = @import("orion/drivers.zig");
-pub const dtb = @import("orion/dtb.zig");
 pub const main = @import("orion/main.zig");
 pub const uefi = @import("orion/uefi.zig");
 
