@@ -87,3 +87,12 @@ pub fn standardDeviceOption(b: *std.Build) Device {
 
     unreachable;
 }
+
+pub fn applyCodeModel(module: *std.Build.Module, codeModel: std.builtin.CodeModel) void {
+    module.code_model = codeModel;
+
+    var iter = module.import_table.iterator();
+    while (iter.next()) |entry| {
+        applyCodeModel(entry.value_ptr.*, codeModel);
+    }
+}

@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
     const device = sdk.standardDeviceOption(b);
     const optimize = b.standardOptimizeOption(.{});
 
-    const target = device.crossTarget();
+    const target = b.resolveTargetQuery(device.crossTarget());
     const arch = device.arch();
 
     const fio = b.dependency("fio", .{
@@ -38,20 +38,21 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .linkage = .static,
+        .code_model = device.codeModel orelse arch.codeModel orelse .default,
     });
 
-    exe.addModule("options", options.createModule());
-    exe.addModule("fio", fio.module("fio"));
-    exe.addModule("dtree", dtree.module("dtree"));
-    exe.addModule("phantom", phantom.module("phantom"));
-    exe.addModule("vizops", vizops.module("vizops"));
+    exe.root_module.addImport("options", options.createModule());
+    exe.root_module.addImport("fio", fio.module("fio"));
+    exe.root_module.addImport("dtree", dtree.module("dtree"));
+    exe.root_module.addImport("phantom", phantom.module("phantom"));
+    exe.root_module.addImport("vizops", vizops.module("vizops"));
 
     if (device.linker) |linkerPath| {
         exe.linker_script = .{ .path = linkerPath };
     }
 
     if (device.codeModel orelse arch.codeModel) |codeModel| {
-        exe.code_model = codeModel;
+        sdk.applyCodeModel(&exe.root_module, codeModel);
     }
 
     if (device.assemblyFiles) |assemblyFiles| {
